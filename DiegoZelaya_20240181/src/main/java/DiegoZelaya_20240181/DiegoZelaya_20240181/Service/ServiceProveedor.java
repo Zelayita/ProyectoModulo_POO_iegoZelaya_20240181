@@ -4,6 +4,7 @@ import DiegoZelaya_20240181.DiegoZelaya_20240181.Entites.EntitesProveedor;
 import DiegoZelaya_20240181.DiegoZelaya_20240181.Exceptions.ExceptionUsuarioNoEncontrado;
 import DiegoZelaya_20240181.DiegoZelaya_20240181.Models.DTO.DTOProvedor;
 import DiegoZelaya_20240181.DiegoZelaya_20240181.Repositories.RepositorioProveedor;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
@@ -47,17 +48,17 @@ public class ServiceProveedor {
         }
     }
 
-    public DTOProvedor ActualizarProveedores(Long providerID,@Valid DTOProvedor dtoProvider){
-        EntitesProveedor entitiesExiste = repo.findById(providerID).orElseThrow(() -> new ExceptionUsuarioNoEncontrado("Proveedor No Encontrado"));
+    public DTOProvedor ActualizarProveedores(Long providerid,@Valid DTOProvedor json){
+        EntitesProveedor entitiesExiste = repo.findById(providerid).orElseThrow(() -> new ExceptionUsuarioNoEncontrado("Proveedor No Encontrado"));
 
-        entitiesExiste.setProviderID(dtoProvider.getProviderID());
-        entitiesExiste.setProviderName(dtoProvider.getProviderName());
-        entitiesExiste.setProviderPhone(dtoProvider.getProviderPhone());
-        entitiesExiste.setProviderAddress(dtoProvider.getProviderAddress());
-        entitiesExiste.setEmail(dtoProvider.getEmail());
-        entitiesExiste.setProviderCode(dtoProvider.getProviderCode());
-        entitiesExiste.setProviderStatus(dtoProvider.getProviderStatus());
-        entitiesExiste.setProviderComments(dtoProvider.getProviderComments());
+        entitiesExiste.setProviderID(json.getProviderID());
+        entitiesExiste.setProviderName(json.getProviderName());
+        entitiesExiste.setProviderPhone(json.getProviderPhone());
+        entitiesExiste.setProviderAddress(json.getProviderAddress());
+        entitiesExiste.setEmail(json.getEmail());
+        entitiesExiste.setProviderCode(json.getProviderCode());
+        entitiesExiste.setProviderStatus(json.getProviderStatus());
+        entitiesExiste.setProviderComments(json.getProviderComments());
 
         EntitesProveedor ProviderActualizado = repo.save(entitiesExiste);
 
@@ -65,11 +66,20 @@ public class ServiceProveedor {
     }
 
 
-
-
-
-
-
+    public boolean RemoverUsuario(Long providerid){
+        try{
+            EntitesProveedor eliminarProvider = repo.findById(providerid).orElse(null);
+            if (eliminarProvider != null){
+                repo.deleteById(providerid);
+                return true;
+            }else{
+                System.out.println("Usuario No encontrado");
+            }
+            return false;
+        }catch(Exception e){
+            throw new EmptyResultDataAccessException("No se pudo eliminar"+ providerid + "Intente otra vez",1);
+        }
+    }
 
 
     private EntitesProveedor ConvertirAProviderEntity(DTOProvedor dtoProvedor) {
@@ -100,18 +110,9 @@ public class ServiceProveedor {
         return dto;
     }
 
-    public boolean RemoverUsuario(Long providerid){
-        try{
-            EntitesProveedor eliminarProvider = repo.findById(providerid).orElse(null);
-            if (eliminarProvider != null){
-                repo.deleteById(providerid);
-                return true;
-            }else{
-                System.out.println("Usuario No encontrado");
-            }
-            return false;
-        }catch(Exception e){
-            throw new EmptyResultDataAccessException("No se pudo eliminar"+ providerid + "Intente otra vez",1);
-        }
+
+    public DTOProvedor ObtneporID(Long providerid) {
+        EntitesProveedor proveedor = repo.findById(providerid).orElseThrow(() -> new EntityNotFoundException("No fue posible encontrar este id" + providerid));
+        return ConvertirAProviderDTO(proveedor);
     }
 }

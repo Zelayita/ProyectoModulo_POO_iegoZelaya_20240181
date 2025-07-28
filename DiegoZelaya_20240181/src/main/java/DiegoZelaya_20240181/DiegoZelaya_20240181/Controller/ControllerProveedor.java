@@ -57,7 +57,7 @@ public class ControllerProveedor {
 
     @PutMapping("/ActualizarProveedor/{providerid}")
     public ResponseEntity<?> ModificarProveedor(
-            @PathVariable Long providerID,
+            @PathVariable Long providerid,
             @Valid @RequestBody DTOProvedor dtoProvedor,
             BindingResult bindingResult){
         if (bindingResult.hasErrors()){
@@ -68,7 +68,7 @@ public class ControllerProveedor {
             return ResponseEntity.badRequest().body(errores);
         }
         try{
-            DTOProvedor proveedoresPut = service.ActualizarProveedores(providerID, dtoProvedor);
+            DTOProvedor proveedoresPut = service.ActualizarProveedores(providerid, dtoProvedor);
             return ResponseEntity.ok(proveedoresPut);
         }
         catch(ExceptionDatosDuplicados e) {
@@ -100,6 +100,9 @@ public class ControllerProveedor {
 
 
     @GetMapping("/BuscarProveedor/{providerid}")
-    public ResponseEntity<DTOProvedor> obtenerporId(@PathVariable Long providerID)
+    public ResponseEntity<DTOProvedor> obtenerporId(@PathVariable Long providerid){
+        DTOProvedor provedor = service.ObtneporID(providerid);
+        return ResponseEntity.ok(provedor);
+    }
 
 }
